@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Saqin Mars APK
 
 on:
   workflow_dispatch:
@@ -24,18 +24,58 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Extract project
+      - name: Extract Saqin Mars
         run: |
-          unzip -q EmployeeTransportFinal.zip -d project
+          unzip -q SaqinMars.zip -d project
 
       - name: Build APK
         run: |
-          PROJECT_DIR=$(find project -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
+          PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
           cd "$PROJECT_DIR"
           gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EmployeeTransport-APK
+          name: SaqinMars-APK
+          path: project/**/app/build/outputs/apk/debug/app-debug.apkname: Build Saqin Mars APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extract Saqin Mars
+        run: |
+          unzip -q SaqinMars.zip -d project
+
+      - name: Build APK
+        run: |
+          PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaqinMars-APK
           path: project/**/app/build/outputs/apk/debug/app-debug.apk
